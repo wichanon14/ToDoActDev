@@ -1,11 +1,11 @@
 import React,{ Component } from 'react';
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 class AddActs extends Component{
 
     render(){
         return(
-            <TouchableHighlight 
+            <TouchableOpacity 
                 onPress={
                     ()=>{
                         this.props.setShowAddActModal(true)
@@ -15,7 +15,7 @@ class AddActs extends Component{
                 <View style={styles.main}>
                     <Text style={styles.txt}>Add Activities</Text>
                 </View>
-            </TouchableHighlight>            
+            </TouchableOpacity>            
         );
     }
 

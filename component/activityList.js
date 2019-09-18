@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View, Alert, StyleSheet, ScrollView} from 'react-native';
+import { View, StyleSheet, ScrollView} from 'react-native';
 import Activity from '../component/activity.js'
 
 class ActivityList extends Component{
@@ -14,42 +14,61 @@ class ActivityList extends Component{
         }
     }
 
-    
-
-    componentWillMount(){
-        this.getActivityList();
-    }
-
     componentWillUpdate(props){
         
         if(props.reRender){
-            this.getActivityList();
             this.props.setReRender(false);
+            this.getActivityList();
         }
     }
 
     getActivityList(){
         
-        fetch('http://10.0.0.212/toDoActService/action.php',{
-            method:'POST',
-            cache: 'no-cache',
-            headers:{
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({
-                "action":"get_actList"
+        if(this.props.TabData.type === "1"){
+            fetch('http://165.22.242.255/toDoActService/action.php',{
+                method:'POST',
+                cache: 'no-cache',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    "action":"get_actList",
+                    "date":(this.props.date.getFullYear()+'-'+(this.props.date.getMonth()+1)+'-'+this.props.date.getDate()),
+                    "tabID":this.props.TabData.ID
+                })
             })
-        })
-        .then(function(response) {
-            return response.json();
-        })
-        .then(response=>{
-            console.log('------------------- AAA ---------------');
-            //console.log(response);
-            this.setState({ActivityList:[]});
-            this.setState({ActivityList:response});
-            //console.log(res[0]);
-        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(response=>{
+                
+                this.setState({ActivityList:[]},()=>{
+                    this.setState({ActivityList:response});
+                });
+            })
+        }else{
+            fetch('http://165.22.242.255/toDoActService/action.php',{
+                method:'POST',
+                cache: 'no-cache',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    "action":"get_actList",
+                    "tabID":this.props.TabData.ID
+                })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(response=>{
+                
+                this.setState({ActivityList:[]},()=>{
+                    this.setState({ActivityList:response});
+                });
+            })
+        }
+        
 
     }
 
@@ -83,6 +102,6 @@ export default ActivityList;
 const styles = StyleSheet.create({
     body:{
         flex:3,
-        borderWidth:2
+        //borderWidth:2
     }
 })

@@ -1,13 +1,36 @@
 import React, {Component} from 'react';
-import {View, Button, Text, TextInput, StyleSheet} from 'react-native';
+import {View, Button, Text, TextInput, StyleSheet, TouchableOpacity,ScrollView, Image} from 'react-native';
 import Modal from 'react-native-modal';
+import { Switch } from 'react-native-switch';
 import BlockColumn from '../component/blockcolumn.js';
+import CloneIcon from '../assets/clone-icon.png';
+import CloneDateModal from '../component/cloneDateModal.js';
 
 class AddActModal extends Component{
+    constructor(props){
+        super(props);
+        this.setShowParentCloneModal = this.setShowParentCloneModal.bind(this);
+        this.props.setShowAddActModal = this.props.setShowAddActModal.bind(this);
+        this.setShowAddActModalChild = this.setShowAddActModalChild.bind(this);
+        this.props.setReRender = this.props.setReRender.bind(this);
+    }
 
     state = {
         Show : false,
-        ActivityName:''
+        ShowCloneModal:false,
+        ActivityName:'',
+        isContinue:false,
+        last_day:'',
+        displayAutocomplete:'none',
+        listAutocompleteAct:[]
+    }
+
+    setShowAddActModalChild(state){
+        this.setState({Show:state});
+    }
+
+    setShowParentCloneModal(state){
+        this.setState({ShowCloneModal:state});
     }
 
     componentWillMount(){
@@ -16,13 +39,17 @@ class AddActModal extends Component{
 
     componentWillUpdate(props){
         if(props.Show != this.state.Show){
-            console.log('will mount >> ',props.Show);
+            
             this.setState({Show:props.Show});
+            this.setState({isContinue:false},()=>this.ShowContinueNumber());
+            this.setState({last_day:''},()=>this.ShowContinueNumber());
+            this.setState({ActivityName:''});
         }
+        
     }
 
     AddActivity(){
-        fetch('http://10.0.0.212/toDoActService/action.php',{
+        fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
             cache: 'no-cache',
             headers:{
@@ -37,7 +64,7 @@ class AddActModal extends Component{
             return response.json();
         })
         .then(response=>{
-            console.log('ID >> ',response['ID']);
+            
             this.setState({Show:false})
             this.props.setShowAddActModal(false);
             this.props.addActToList(response['ID']);
@@ -45,6 +72,70 @@ class AddActModal extends Component{
         })
     }
 
+    ShowContinueNumber(){
+        
+        if(this.state.isContinue){
+            fetch('http://165.22.242.255/toDoActService/action.php',{
+                method:'POST',
+                cache: 'no-cache',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    "action":"get_latest_date_act",
+                    "activity_name":this.state.ActivityName
+                })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(response=>{
+                
+                this.setState({last_day:'#'+response.last_day});
+                
+            })
+        }else{
+            this.setState({last_day:''});
+        }
+    }
+
+    AutocompleteActivity(){
+
+        fetch('http://165.22.242.255/toDoActService/action.php',{
+                method:'POST',
+                cache: 'no-cache',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({
+                    "action":"get_actMaster",
+                    "keyword":this.state.ActivityName
+                })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(response=>{
+                
+                if(response.length>0 && this.state.ActivityName.length>0){
+                    this.setState({displayAutocomplete:'flex'});
+                    this.setState({listAutocompleteAct:[]});
+                    this.setState({listAutocompleteAct:response});
+                }else{
+                    this.setState({displayAutocomplete:'none'});
+                    this.setState({listAutocompleteAct:[]});
+                }
+                
+                
+            })
+
+    }
+
+    onSelectAutocomplete(item){
+        
+        this.setState({ActivityName:item.activity_name},
+            ()=>this.setState({displayAutocomplete:'none'}))
+    }
 
     render(){
         return(
@@ -54,9 +145,36 @@ class AddActModal extends Component{
                 animationOutTiming={500}
                 backdropTransitionOutTiming = {10}
                 >
+                <CloneDateModal 
+                    Show={this.state.ShowCloneModal}
+                    setShowParentCloneModal={this.setShowParentCloneModal}
+                    setShowAddActModal={this.props.setShowAddActModal}
+                    setShowAddActModalChild = {this.setShowAddActModalChild}
+                    selectDate={this.props.selectDate}
+                    setReRender={this.props.setReRender}
+                    TabData={this.props.TabData}
+                    />
                 <BlockColumn size={0.2}/>
-                <View style={styles.bodyModal}>
-                    <BlockColumn size={0.2}/>
+                <View style={styles.bodyModal}>                 
+                    <BlockColumn size={0.05}/>
+                    <View style={{height:30,flexDirection:'row'}}>
+                        <BlockColumn size={0.95}/>
+
+                        <TouchableOpacity
+                            onPress={()=>{
+                                this.setState({ShowCloneModal:!this.state.ShowCloneModal});
+                            }}
+                        >
+                            <View style={{alignItems:'center',opacity:0.6}}>
+                                <Image source={CloneIcon} style={{width:20,height:20}}/>
+                                <BlockColumn size={0.2}/>
+                                <Text style={{color:'gray',fontSize:10}}>Clone</Text>
+                            </View>
+                        </TouchableOpacity>
+
+                    </View>
+                    
+                    <BlockColumn size={0.05}/>
                     <View>
                         <Text style={styles.HeadCenter}>
                             Add Activity 
@@ -69,12 +187,73 @@ class AddActModal extends Component{
                             borderColor: 'gray', borderWidth: 1,
                             alignSelf:'center',paddingLeft:10}}
                         onChangeText={(txt)=>{
-                            this.setState({ActivityName:txt})
-                            console.log('txt >> ',this.state.ActivityName);
+                            this.setState({ActivityName:txt},()=>this.AutocompleteActivity())  
                         }}
-                        value={this.setState.ActivityName}
+                        value={this.state.ActivityName}
                         placeholder="Activity Name"
                     />
+                    
+                    <ScrollView style={{
+                        maxHeight:'30%',
+                        display:this.state.displayAutocomplete}}>
+                        {
+                            this.state.listAutocompleteAct.map((item,i)=>{
+                                return(
+                                    <TouchableOpacity
+                                        style={{width:'70%',height: 40, 
+                                            borderColor: 'gray', borderWidth: 1,
+                                            alignSelf:'center',justifyContent:'center',
+                                            backgroundColor:'black'}}
+                                        key={item.ID}
+                                        onPress={
+                                            ()=>this.onSelectAutocomplete(item)
+                                        }
+                                    >
+                                        <Text style={{textAlign:'center',color:'white'}}>
+                                            {item.activity_name}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })
+                        }
+                        
+                    </ScrollView>
+                    
+                    <BlockColumn size={0.2}/>
+                    <View>
+                        <View style={{flexDirection:'row'}}>
+                            <BlockColumn size={0.2}/>
+                            <Text>
+                                Continue Activity
+                            </Text>
+                        </View>
+                        <View style={{flexDirection:'row'}}>
+                            <BlockColumn size={0.2}/>                        
+                            <Switch 
+                                value={this.state.isContinue}
+                                onValueChange={()=>{
+                                    this.setState({isContinue:!this.state.isContinue},
+                                        ()=>{
+                                            this.props.setIsContinue(this.state.isContinue);
+                                            this.ShowContinueNumber();
+                                        });
+                                }}
+                                activeText={'Yes'}
+                                inActiveText={'No'}
+                                circleSize={30}
+                            />
+                            <BlockColumn size={0.5}/>                
+                            <Text
+                                style={{textAlignVertical:'center'}}
+                            >
+                                {
+                                    this.state.last_day
+                                }
+                            </Text>        
+                        </View>
+                        
+                    </View>
+
                     <BlockColumn size={0.3}/>
                     <View style={{flexDirection:'row'}}>
                         
@@ -90,12 +269,14 @@ class AddActModal extends Component{
                             title="Close"
                             onPress={()=>{
                                 this.setState({Show:false})
+                                this.props.setShowAddActModal(false);
                             }}
                         />
                         <BlockColumn size={0.5}/>
                     </View>
+                    <BlockColumn size={0.3}/>
                 </View>
-                <BlockColumn size={0.5}/>
+                <BlockColumn size={0.2}/>
             </Modal>
             
         );
@@ -107,7 +288,8 @@ export default AddActModal;
 
 const styles = StyleSheet.create({
     bodyModal:{
-        flex:1,
+        //flex:1,
+        minHeight:'100%',
         backgroundColor:'white'
     },
     HeadCenter:{
@@ -115,5 +297,9 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         alignSelf:'center',
         justifyContent:'center'
+    },
+    bodyModalDate:{
+        minHeight:'50%',
+        backgroundColor:'white'
     }
 })

@@ -18,7 +18,7 @@ class Activity extends Component{
     }
 
     selectList(){
-        fetch('http://10.0.0.212/toDoActService/action.php',{
+        fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
             cache: 'no-cache',
             headers:{
@@ -34,15 +34,13 @@ class Activity extends Component{
         })
         .then(response=>{
             
-            console.log(response);
-            //this.setState({isCheck:!this.state.isCheck});
             this.props.setReRender(true);
             
         })
     }
 
     deleteList(){
-        fetch('http://10.0.0.212/toDoActService/action.php',{
+        fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
             cache: 'no-cache',
             headers:{
@@ -57,9 +55,6 @@ class Activity extends Component{
             return response.json();
         })
         .then(response=>{
-            
-            console.log(response);
-            //this.setState({isCheck:!this.state.isCheck});
             this.props.setReRender(true);
             
         })
@@ -102,7 +97,7 @@ export default Activity;
 const styles = StyleSheet.create({
     body:{
         flexDirection:'row',
-        height:70,
+        height:40,
         minWidth:'70%'
     }
 })
