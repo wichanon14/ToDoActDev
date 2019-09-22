@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View, StyleSheet, ScrollView} from 'react-native';
+import { View, StyleSheet, ScrollView, AsyncStorage} from 'react-native';
 import Activity from '../component/activity.js'
 
 class ActivityList extends Component{
@@ -10,8 +10,20 @@ class ActivityList extends Component{
         this.getActivityList = this.getActivityList.bind(this);
         this.props.setReRender = this.props.setReRender.bind(this)
         this.state={
-            ActivityList:[]
+            ActivityList:[],
+            token:''
         }
+    }
+
+    componentWillMount(){
+        //get token from storage
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
     }
 
     componentWillUpdate(props){
@@ -33,6 +45,7 @@ class ActivityList extends Component{
                 },
                 body:JSON.stringify({
                     "action":"get_actList",
+                    "token":this.state.token,
                     "date":(this.props.date.getFullYear()+'-'+(this.props.date.getMonth()+1)+'-'+this.props.date.getDate()),
                     "tabID":this.props.TabData.ID
                 })
@@ -55,6 +68,7 @@ class ActivityList extends Component{
                 },
                 body:JSON.stringify({
                     "action":"get_actList",
+                    "token":this.state.token,
                     "tabID":this.props.TabData.ID
                 })
             })

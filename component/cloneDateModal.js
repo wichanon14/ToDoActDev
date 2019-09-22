@@ -1,10 +1,10 @@
 import React,{ Component } from 'react';
-import { Text, View, Button, StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native';
+import { Text, View, Button, StyleSheet, TouchableOpacity, 
+    Image, ScrollView, AsyncStorage } from 'react-native';
 import Modal from 'react-native-modal';
 import BlockColumn from '../component/blockcolumn.js';
 import arrowUp from '../assets/arrow-up.jpg';
 import arrowDown from '../assets/arrow-down.jpg';
-import ActivityList from '../component/activityList.js';
 
 class CloneDateModal extends Component{
 
@@ -15,7 +15,19 @@ class CloneDateModal extends Component{
         year:0,
         monthName:'',
         retrieveDate:new Date(),
-        ActivityList:[]
+        ActivityList:[],
+        token:''
+    }
+
+    componentWillMount(){
+        //get token from storage
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
     }
 
     componentWillUpdate(props){
@@ -136,6 +148,7 @@ class CloneDateModal extends Component{
             },
             body:JSON.stringify({
                 "action":"get_actList",
+                "token":this.state.token,
                 "date":date,
                 "tabID":this.props.TabData.ID
             })
@@ -160,6 +173,7 @@ class CloneDateModal extends Component{
             },
             body:JSON.stringify({
                 "action":"cloneList",
+                "token":this.state.token,
                 "CloneDate":this.state.year+'-'+(this.state.month+1)+'-'+this.state.date,
                 "SetDate":this.props.selectDate.getFullYear()+'-'+(this.props.selectDate.getMonth()+1)+'-'+this.props.selectDate.getDate(),
                 "tabID":this.props.TabData.ID

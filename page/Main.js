@@ -1,11 +1,13 @@
 import React,{ Component } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, BackHandler, AsyncStorage } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import Header from '../component/header.js';
 import ActivityList from '../component/activityList.js';
 import BlockColumn from '../component/blockcolumn.js';
 import AddActs from '../component/addActs.js';
 import AddActsModal from '../component/addActModal.js';
 import ModalSelectDate from '../component/modalSelectDate.js';
+import SettingTab from '../component/SettingTab.js';
 
 class Main extends Component{
     constructor(props){
@@ -31,7 +33,31 @@ class Main extends Component{
         },
         TabDataDefault:{
 
-        }
+        },
+        token:''
+    }
+
+    componentWillMount(){
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
+    }
+
+    //Disabled Back Button
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressed);
+    }
+    
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressed);
+    }
+    
+    onBackButtonPressed() {
+        return true;
     }
 
     setShowAddActModal(isShow){
@@ -64,6 +90,9 @@ class Main extends Component{
     }
 
     addActToList(ID){
+
+        console.log('token >> ',this.state.token);
+
         fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
             cache: 'no-cache',
@@ -75,7 +104,8 @@ class Main extends Component{
                 "ID":ID,
                 "is_continue":this.state.isContinue,
                 "date":(this.state.selectDate.getFullYear()+'-'+(this.state.selectDate.getMonth()+1)+'-'+this.state.selectDate.getDate()),
-                "tabID":this.state.TabData.ID
+                "tabID":this.state.TabData.ID,
+                "token":this.state.token
             })
         })
         .then(function(response) {
@@ -106,7 +136,7 @@ class Main extends Component{
                     setSelectDate={this.setSelectDate}
                     setReRender={this.setReRender}
                 />
-                <BlockColumn size={0.5} />
+                <SettingTab />
                 <Header 
                     setSelectDateModal={this.setSelectDateModal}
                     date={this.state.selectDate}

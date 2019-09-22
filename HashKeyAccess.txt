@@ -1,0 +1,25 @@
+Hash on app
+
+    Encode
+    1.password number ->  Alphabet password
+    2.Hashkey must start with '$$'
+    3.Random 5 ascii and concat each Alphabet password
+    4.End with '=='
+
+    Decode
+    1.get alphabet from password string position (7,13,19,25,31,37)
+    2.Alphabet password -> password number
+    3.get Access Key
+
+Hash for store
+
+    Encode
+    1.password number ->  Alphabet password
+    2.Hashkey must start with '$$'
+    3.concat each Alphabet password to Random 7 ascii
+    4.End with 'XX'
+
+    Decode
+    1.get alphabet from password string position (2,10,18,26,34,42)
+    2.Alphabet password -> password number
+    3.get Access Key

@@ -1,15 +1,25 @@
 import React, {Component} from 'react';
-import { Alert, View, StyleSheet, TouchableHighlight } from 'react-native';
+import { Alert, View, StyleSheet, AsyncStorage } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 
 class Activity extends Component{
 
     state={
-        isCheck : false
+        isCheck : false,
+        token: ''
     }
 
     componentWillMount(){
-        
+
+        //get token from storage
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
+
         if(this.props.check==="0"){
             this.setState({isCheck:false});
         }else{
@@ -26,7 +36,8 @@ class Activity extends Component{
             },
             body:JSON.stringify({
                 "action":"select_list",
-                "ID":this.props.id
+                "ID":this.props.id,
+                "token":this.state.token
             })
         })
         .then(function(response) {
@@ -48,6 +59,7 @@ class Activity extends Component{
             },
             body:JSON.stringify({
                 "action":"delete_list",
+                "token":this.state.token,
                 "ID":this.props.id
             })
         })

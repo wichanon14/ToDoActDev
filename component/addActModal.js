@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {View, Button, Text, TextInput, StyleSheet, TouchableOpacity,ScrollView, Image} from 'react-native';
+import {View, Button, Text, TextInput, StyleSheet, TouchableOpacity,
+    ScrollView, Image, AsyncStorage } from 'react-native';
 import Modal from 'react-native-modal';
 import { Switch } from 'react-native-switch';
 import BlockColumn from '../component/blockcolumn.js';
@@ -22,7 +23,8 @@ class AddActModal extends Component{
         isContinue:false,
         last_day:'',
         displayAutocomplete:'none',
-        listAutocompleteAct:[]
+        listAutocompleteAct:[],
+        token:''
     }
 
     setShowAddActModalChild(state){
@@ -35,6 +37,14 @@ class AddActModal extends Component{
 
     componentWillMount(){
         this.setState({Show:this.props.Show});
+
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
     }
 
     componentWillUpdate(props){
@@ -83,6 +93,7 @@ class AddActModal extends Component{
                 },
                 body:JSON.stringify({
                     "action":"get_latest_date_act",
+                    "token":this.state.token,
                     "activity_name":this.state.ActivityName
                 })
             })
@@ -90,7 +101,7 @@ class AddActModal extends Component{
                 return response.json();
             })
             .then(response=>{
-                
+                console.log('response >> ',response);
                 this.setState({last_day:'#'+response.last_day});
                 
             })
