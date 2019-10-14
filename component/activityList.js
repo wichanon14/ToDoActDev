@@ -11,8 +11,11 @@ class ActivityList extends Component{
         this.props.setReRender = this.props.setReRender.bind(this)
         this.state={
             ActivityList:[],
-            token:''
+            token:'',
+            parentListSelect:0
         }
+        this.props.setParentList = this.props.setParentList.bind(this);
+        this.setParentListSelect = this.setParentListSelect.bind(this);
     }
 
     componentWillMount(){
@@ -32,6 +35,10 @@ class ActivityList extends Component{
             this.props.setReRender(false);
             this.getActivityList();
         }
+    }
+
+    setParentListSelect(state){
+        this.setState({parentListSelect:state});
     }
 
     getActivityList(){
@@ -99,6 +106,11 @@ class ActivityList extends Component{
                                     key={key}
                                     check = {data.is_complete}
                                     setReRender={this.props.setReRender}
+                                    parentList={data.parentList}
+                                    amountSubList={data.amountSubList}
+                                    setParentList={this.props.setParentList}
+                                    setShowHiddenList={this.state.parentListSelect}
+                                    setParentListSelect={this.setParentListSelect}
                                 />
                             )
                         })

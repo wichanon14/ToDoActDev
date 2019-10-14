@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, AsyncStorage,TouchableOpacity, StyleSheet } from 'react-native';
 import ModalTabSelect from '../component/modalTabSelect.js';
 
 class Header extends Component{
@@ -14,7 +14,8 @@ class Header extends Component{
     state = {
         date:new Date(),
         showModalTabSelect:false,
-        elementDate:<View></View>
+        elementDate:<View></View>,
+        token:''
     }
 
     setShowModalTabSelect(state){
@@ -64,7 +65,16 @@ class Header extends Component{
     }
 
     componentWillMount(){
-        this.getDefaultTab();
+
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value},()=>{
+                    this.getDefaultTab();
+                });
+            }else{
+                Actions.signin();
+            }
+        });
     }
 
     getDefaultTab(){
@@ -75,7 +85,8 @@ class Header extends Component{
                 'Content-Type':'application/json'
             },
             body:JSON.stringify({
-                "action":"getDefaultTabList"
+                "action":"getDefaultTabList",
+                "token":this.state.token
             })
         })
         .then(function(response) {

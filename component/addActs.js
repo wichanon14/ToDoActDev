@@ -8,7 +8,8 @@ class AddActs extends Component{
             <TouchableOpacity 
                 onPress={
                     ()=>{
-                        this.props.setShowAddActModal(true)
+                        this.props.setShowAddActModal(true);
+                        this.props.setParentList('',0);
                     }
                 }
             >

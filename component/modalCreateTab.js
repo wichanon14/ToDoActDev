@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, AsyncStorage, Text, TextInput, Button, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import BlockColumn from '../component/blockcolumn.js';
 import SelectItem from '../component/selectItem.js';
@@ -14,7 +14,18 @@ class ModalCreateTab extends Component{
     state={
         Show:false,
         Name:'',
-        Type:0
+        Type:0,
+        token:''
+    }
+
+    componentWillMount(){
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
     }
 
     componentWillUpdate(props){
@@ -39,7 +50,8 @@ class ModalCreateTab extends Component{
             body:JSON.stringify({
                 "action":"create_tab",
                 "TabName":TabName,
-                "Type":this.state.Type
+                "Type":this.state.Type,
+                "token":this.state.token
             })
         })
         .then(function(response) {

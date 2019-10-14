@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
-import { Alert, View, StyleSheet, AsyncStorage } from 'react-native';
+import { Alert, View, StyleSheet, AsyncStorage, Text, TouchableOpacity } from 'react-native';
 import { CheckBox } from 'react-native-elements';
+import showPopupMenu from 'react-native-popup-menu-android'
+
 
 class Activity extends Component{
 
     state={
         isCheck : false,
-        token: ''
+        token: '',
+        parentList:0,
+        showHideSubList:false
     }
 
     componentWillMount(){
@@ -24,6 +28,12 @@ class Activity extends Component{
             this.setState({isCheck:false});
         }else{
             this.setState({isCheck:true});
+        }
+    }
+
+    componentWillUpdate(props){
+        if(props.parentList!=this.state.parentList){
+            this.setState({parentList:props.parentList});
         }
     }
 
@@ -84,20 +94,92 @@ class Activity extends Component{
         )
     }
 
+    moreButton = null;
+    refMoreButton = el => this.moreButton = el;
+
+    showMore = () => {
+        console.log(this.props.label.length);
+        if(this.state.parentList==0){
+            showPopupMenu(
+                [
+                  { id:1, label:'Add SubList' },
+                  { id:2, label:'Delete' }
+                ],
+                this.handleMoreItemSelect,
+                this.moreButton
+              );
+        }else{
+            showPopupMenu(
+                [
+                  { id:2, label:'Delete' }
+                ],
+                this.handleMoreItemSelect,
+                this.moreButton
+              );
+        }
+        
+    }
+
+    handleMoreItemSelect = (item) => {
+        switch(item.id){
+            case 0: this.selectList(); break;
+            case 1: this.props.setParentList(this.props.label,this.props.id); break;
+            case 2: this.ConfirmDelete(); break;
+            default: break;
+        }
+    }
+
+    showHiddenSubList(){
+        if(this.props.setShowHiddenList==0){
+            this.props.setParentListSelect(this.props.id);
+        }else{
+            this.props.setParentListSelect(0);
+        }
+        
+    }
+
     render(){
+        const styles = StyleSheet.create({
+            body:{
+                flexDirection:'row',
+                height:(this.props.parentList!=0)?((this.props.label.length>30)?60:40):40,
+                minWidth:'70%',
+                display:
+                (this.props.parentList==0)?'flex':
+                ((this.props.parentList==this.props.setShowHiddenList)?'flex':'none')
+            }
+        })
         return(
-            <View style={styles.body}>
+            <View style={styles.body} >
                 <CheckBox
+                ref={this.refMoreButton}
                 title={this.props.label}
                 checked={this.state.isCheck}
                 onPress={()=>{
                     this.selectList();
                 }}
                 onLongPress={()=>{
-                    this.ConfirmDelete();
+                    this.showMore();
                 }}
-                containerStyle = {{minWidth:'70%',backgroundColor:'transparent',borderWidth:0}}
+                containerStyle = {{minWidth:'10%',maxWidth:'70%',
+                backgroundColor:'transparent',borderWidth:0,flexWrap: 'wrap',
+                paddingLeft:(this.props.parentList!=0)?'10%':'3%'}}
                 />
+                {
+                    (this.props.amountSubList!=0 && this.props.parentList==0)?(
+                        <TouchableOpacity onPress={()=>{
+                            this.showHiddenSubList();
+                        }} style={{marginTop:'4%',minWidth:'10%',maxWidth:'10%',
+                        backgroundColor:'black',borderRadius:50}}>
+                            <Text style={{textAlign:'center',paddingTop:'15%',color:'white'}}>
+                            {this.props.amountSubList}    
+                            </Text>               
+                        </TouchableOpacity>
+                                
+                    ):(
+                        <View></View>
+                    )
+                }
             </View>
         )
     }
@@ -106,10 +188,3 @@ class Activity extends Component{
 
 export default Activity;
 
-const styles = StyleSheet.create({
-    body:{
-        flexDirection:'row',
-        height:40,
-        minWidth:'70%'
-    }
-})

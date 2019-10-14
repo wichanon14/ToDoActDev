@@ -127,9 +127,10 @@ class ModalSelectDate extends Component{
 
     onSelectDate(){
         //console.log('> ',this.state.date,'/',this.state.month,'/',this.state.year);
-        var monthString = (this.state.month+1>10)?this.state.month+1:'0'+(this.state.month+1);
+        var monthString = (this.state.month+1>9)?this.state.month+1:'0'+(this.state.month+1);
         var dateString = (this.state.date>9)?this.state.date:'0'+(this.state.date);
         var dateString = this.state.year+'-'+monthString+'-'+dateString;
+        //console.log('select dateString >> ',dateString);
         var d = new Date(dateString);
         //console.log('select dateString >> ',d);
         this.props.setSelectDate(d);

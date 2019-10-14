@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Button, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, AsyncStorage, Button, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import BlockColumn from '../component/blockcolumn.js';
 import ModalCreateTab from '../component/modalCreateTab.js';
@@ -14,7 +14,8 @@ class ModalTabSelect extends Component{
     state={
         Show:false,
         ShowModalCreateTab:false,
-        TabList:[]
+        TabList:[],
+        token:''
     }
 
     setShowModalCreateTab(state){
@@ -30,6 +31,17 @@ class ModalTabSelect extends Component{
 
     }
 
+    componentWillMount(){
+
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
+    }
+
     getTabList(){
         fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
@@ -38,7 +50,8 @@ class ModalTabSelect extends Component{
                 'Content-Type':'application/json'
             },
             body:JSON.stringify({
-                "action":"getTabList"
+                "action":"getTabList",
+                "token":this.state.token
             })
         })
         .then(function(response) {
@@ -61,7 +74,8 @@ class ModalTabSelect extends Component{
             },
             body:JSON.stringify({
                 "action":"deleteTab",
-                "ID":obj.ID
+                "ID":obj.ID,
+                "token":this.state.token
             })
         })
         .then(function(response){

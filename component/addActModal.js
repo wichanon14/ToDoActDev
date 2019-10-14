@@ -6,6 +6,7 @@ import { Switch } from 'react-native-switch';
 import BlockColumn from '../component/blockcolumn.js';
 import CloneIcon from '../assets/clone-icon.png';
 import CloneDateModal from '../component/cloneDateModal.js';
+import ResetContinueActivity from '../component/resetContinueActivity.js';
 
 class AddActModal extends Component{
     constructor(props){
@@ -14,6 +15,9 @@ class AddActModal extends Component{
         this.props.setShowAddActModal = this.props.setShowAddActModal.bind(this);
         this.setShowAddActModalChild = this.setShowAddActModalChild.bind(this);
         this.props.setReRender = this.props.setReRender.bind(this);
+        this.props.setResetContinue = this.props.setResetContinue.bind(this);
+        this.ShowContinueNumber = this.ShowContinueNumber.bind(this);
+        this.setLastestDay = this.setLastestDay.bind(this);
     }
 
     state = {
@@ -51,8 +55,11 @@ class AddActModal extends Component{
         if(props.Show != this.state.Show){
             
             this.setState({Show:props.Show});
-            this.setState({isContinue:false},()=>this.ShowContinueNumber());
-            this.setState({last_day:''},()=>this.ShowContinueNumber());
+            this.setState({isContinue:false},()=>{
+                this.setState({isReset:false});
+                this.setState({ResetComponent:<View></View>});
+            });
+            this.setState({last_day:''});
             this.setState({ActivityName:''});
         }
         
@@ -94,14 +101,15 @@ class AddActModal extends Component{
                 body:JSON.stringify({
                     "action":"get_latest_date_act",
                     "token":this.state.token,
-                    "activity_name":this.state.ActivityName
+                    "activity_name":this.state.ActivityName,
+                    "acttivity_date":(this.props.selectDate.getFullYear()+'-'+(this.props.selectDate.getMonth()+1)+'-'+this.props.selectDate.getDate())
                 })
             })
             .then(function(response) {
                 return response.json();
             })
             .then(response=>{
-                console.log('response >> ',response);
+                //console.log('response >> ',response);
                 this.setState({last_day:'#'+response.last_day});
                 
             })
@@ -148,6 +156,10 @@ class AddActModal extends Component{
             ()=>this.setState({displayAutocomplete:'none'}))
     }
 
+    setLastestDay(state){
+        this.setState({last_day:state});
+    }
+
     render(){
         return(
             <Modal
@@ -189,6 +201,9 @@ class AddActModal extends Component{
                     <View>
                         <Text style={styles.HeadCenter}>
                             Add Activity 
+                        </Text>                        
+                        <Text style={{textAlign:'center'}}>
+                            {(this.props.parent)?'Parent List : '+this.props.parent:''}
                         </Text>
                     </View>
                     <BlockColumn size={0.2}/>
@@ -245,8 +260,9 @@ class AddActModal extends Component{
                                 onValueChange={()=>{
                                     this.setState({isContinue:!this.state.isContinue},
                                         ()=>{
-                                            this.props.setIsContinue(this.state.isContinue);
+                                            this.setState({isReset:false});
                                             this.ShowContinueNumber();
+                                            this.props.setIsContinue(this.state.isContinue);
                                         });
                                 }}
                                 activeText={'Yes'}
@@ -264,6 +280,13 @@ class AddActModal extends Component{
                         </View>
                         
                     </View>
+
+                    <ResetContinueActivity 
+                        Show={this.state.isContinue}
+                        setResetContinue={this.props.setResetContinue}
+                        ShowContinueNumber={this.ShowContinueNumber}
+                        setLastestDay={this.setLastestDay}
+                    />
 
                     <BlockColumn size={0.3}/>
                     <View style={{flexDirection:'row'}}>

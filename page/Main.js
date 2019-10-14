@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { View, Text, Button, StyleSheet, BackHandler, AsyncStorage } from 'react-native';
+import { View, Text, Button, StyleSheet, BackHandler, AsyncStorage,ImageBackground } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import Header from '../component/header.js';
 import ActivityList from '../component/activityList.js';
@@ -17,9 +17,12 @@ class Main extends Component{
         this.addActToList = this.addActToList.bind(this);
         this.setReRender = this.setReRender.bind(this);
         this.setIsContinue = this.setIsContinue.bind(this);
+        this.setResetContinue = this.setResetContinue.bind(this);
         this.setSelectDateModal = this.setSelectDateModal.bind(this);
         this.setSelectDate = this.setSelectDate.bind(this);
         this.setTab = this.setTab.bind(this);
+        this.setMainBackground = this.setMainBackground.bind(this);
+        this.setParentList = this.setParentList.bind(this);
     }
 
     state={
@@ -27,6 +30,7 @@ class Main extends Component{
         ShowSelectDateModal:false,
         reRender:false,
         isContinue:false,
+        isResetContinue:false,
         selectDate:(new Date()),
         TabData:{
             TabName:'Daily Activity List'
@@ -34,7 +38,10 @@ class Main extends Component{
         TabDataDefault:{
 
         },
-        token:''
+        token:'',
+        MainBackground:null,
+        parentList:'',
+        parentListID:0
     }
 
     componentWillMount(){
@@ -43,6 +50,11 @@ class Main extends Component{
                 this.setState({token:value});
             }else{
                 Actions.signin();
+            }
+        });
+        AsyncStorage.getItem('backgroundImg').then((value)=>{
+            if(value){
+                this.setState({MainBackground:value});
             }
         });
     }
@@ -70,6 +82,10 @@ class Main extends Component{
         });
     }
 
+    setMainBackground(img){
+        this.setState({MainBackground:img});
+    }
+
     setReRender(state){
         this.setState({reRender:state});
     }
@@ -82,16 +98,27 @@ class Main extends Component{
         this.setState({isContinue:state});
     }
 
+    setResetContinue(state){
+        this.setState({isResetContinue:state});
+    }
+
     setTab(data){
-        //console.log('dataTab >> ',data);
         this.setState({TabData:data},()=>{
             this.setState({reRender:true});
         });
     }
 
+    setParentList(parentName,parentID){
+        /*console.log('Name >> ',parentName);
+        console.log('ID >> ',parentID);*/
+        this.setState({parentListID:parentID})
+        this.setState({parentList:parentName},()=>{
+            this.setShowAddActModal(true);
+        });
+    }
+
     addActToList(ID){
 
-        console.log('token >> ',this.state.token);
 
         fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
@@ -103,9 +130,11 @@ class Main extends Component{
                 "action":"insert_actList",
                 "ID":ID,
                 "is_continue":this.state.isContinue,
+                "is_reset":this.state.isResetContinue,
                 "date":(this.state.selectDate.getFullYear()+'-'+(this.state.selectDate.getMonth()+1)+'-'+this.state.selectDate.getDate()),
                 "tabID":this.state.TabData.ID,
-                "token":this.state.token
+                "token":this.state.token,
+                "parentList":this.state.parentListID
             })
         })
         .then(function(response) {
@@ -120,42 +149,50 @@ class Main extends Component{
 
     render(){
         return(
-            <View style={styles.bodyPage}>
-                <AddActsModal Show={this.state.ShowAddActModal}
-                    addActToList = {this.addActToList}    
-                    setShowAddActModal = {this.setShowAddActModal}
-                    setIsContinue={this.setIsContinue}
-                    selectDate={this.state.selectDate}
-                    setReRender={this.setReRender}
-                    TabData={this.state.TabData}
-                />
-                <ModalSelectDate 
-                    Show={this.state.ShowSelectDateModal}
-                    setSelectDateModal={this.setSelectDateModal}
-                    selectDate={this.state.selectDate}
-                    setSelectDate={this.setSelectDate}
-                    setReRender={this.setReRender}
-                />
-                <SettingTab />
-                <Header 
-                    setSelectDateModal={this.setSelectDateModal}
-                    date={this.state.selectDate}
-                    Tab={this.state.TabData}
-                    setTab={this.setTab}
-                    setReRender={this.setReRender}
-                />
-                <ActivityList 
-                    reRender={this.state.reRender}
-                    setReRender={this.setReRender}
-                    date={this.state.selectDate}
-                    TabData={this.state.TabData}
-                />
-                <BlockColumn size={0.5} />
-                <AddActs 
-                    setShowAddActModal={this.setShowAddActModal}
-                />
-                <BlockColumn size={0.5} />
-            </View>
+            <ImageBackground source={{uri:this.state.MainBackground}} style={{width: '100%', height: '100%'}}>
+                <View style={styles.bodyPage}>
+                    <AddActsModal Show={this.state.ShowAddActModal}
+                        addActToList = {this.addActToList}    
+                        setShowAddActModal = {this.setShowAddActModal}
+                        setIsContinue={this.setIsContinue}
+                        setResetContinue={this.setResetContinue}
+                        selectDate={this.state.selectDate}
+                        setReRender={this.setReRender}
+                        TabData={this.state.TabData}
+                        parent={this.state.parentList}
+                    />
+                    <ModalSelectDate 
+                        Show={this.state.ShowSelectDateModal}
+                        setSelectDateModal={this.setSelectDateModal}
+                        selectDate={this.state.selectDate}
+                        setSelectDate={this.setSelectDate}
+                        setReRender={this.setReRender}
+                    />
+                    <SettingTab 
+                        setMainBackground = {this.setMainBackground}
+                    />
+                    <Header 
+                        setSelectDateModal={this.setSelectDateModal}
+                        date={this.state.selectDate}
+                        Tab={this.state.TabData}
+                        setTab={this.setTab}
+                        setReRender={this.setReRender}
+                    />
+                    <ActivityList 
+                        reRender={this.state.reRender}
+                        setReRender={this.setReRender}
+                        date={this.state.selectDate}
+                        TabData={this.state.TabData}
+                        setParentList={this.setParentList}
+                    />
+                    <BlockColumn size={0.5} />
+                    <AddActs 
+                        setShowAddActModal={this.setShowAddActModal}
+                        setParentList={this.setParentList}
+                    />
+                    <BlockColumn size={0.5} />
+                </View>
+            </ImageBackground>
         )
     }
 
@@ -168,6 +205,6 @@ const styles = StyleSheet.create({
         flex:1,
         alignItems:'center',
         justifyContent:'center',
-        //backgroundColor:'red',
+        backgroundColor:'rgba(255,255,255,0.8)'
     }
 });
