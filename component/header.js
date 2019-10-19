@@ -23,7 +23,7 @@ class Header extends Component{
     }
 
     setElementDate(type){
-        if(type === "1"){
+        if(type === "1" || type === "4"){
             this.setState({elementDate:(
                 <TouchableOpacity 
                     onPress={()=>{
@@ -156,7 +156,9 @@ const styles = StyleSheet.create({
     },
     HeadCenter:{
         fontSize:30,
-        fontWeight:'bold'
+        fontWeight:'bold',
+        alignSelf:'center',
+        justifyContent:'center'
     },
     TextCenter:{
         textAlign:'center'

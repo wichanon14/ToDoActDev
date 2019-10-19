@@ -8,13 +8,26 @@ class AddActs extends Component{
             <TouchableOpacity 
                 onPress={
                     ()=>{
-                        this.props.setShowAddActModal(true);
+                        console.log(this.props.TabData);
+                        switch(parseInt(this.props.TabData.type)){
+                            case 1: this.props.setStateFromChild('ShowAddActModal',true); break;
+                            case 2: this.props.setStateFromChild('ShowAddActModal',true); break;
+                            case 3: this.props.setStateFromChild('ShowAddActModal',true); break;
+                            case 4: this.props.setStateFromChild('ShowAddTransModal',true); break;
+                            default:break;
+                        }
                         this.props.setParentList('',0);
                     }
                 }
             >
                 <View style={styles.main}>
-                    <Text style={styles.txt}>Add Activities</Text>
+                    <Text style={styles.txt}>
+                        {
+                            (parseInt(this.props.TabData.type) === 1)?
+                            'Add Activities':
+                            'Add Transactions'
+                        }    
+                    </Text>
                 </View>
             </TouchableOpacity>            
         );

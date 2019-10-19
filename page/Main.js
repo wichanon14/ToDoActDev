@@ -7,6 +7,7 @@ import BlockColumn from '../component/blockcolumn.js';
 import AddActs from '../component/addActs.js';
 import AddActsModal from '../component/addActModal.js';
 import ModalSelectDate from '../component/modalSelectDate.js';
+import AddTransModal from '../component/addTransModal.js';
 import SettingTab from '../component/SettingTab.js';
 
 class Main extends Component{
@@ -23,10 +24,12 @@ class Main extends Component{
         this.setTab = this.setTab.bind(this);
         this.setMainBackground = this.setMainBackground.bind(this);
         this.setParentList = this.setParentList.bind(this);
+        this.setStateFromChild = this.setStateFromChild.bind(this);
     }
 
     state={
         ShowAddActModal:false,
+        ShowAddTransModal:false,
         ShowSelectDateModal:false,
         reRender:false,
         isContinue:false,
@@ -52,8 +55,10 @@ class Main extends Component{
                 Actions.signin();
             }
         });
+        
         AsyncStorage.getItem('backgroundImg').then((value)=>{
             if(value){
+                
                 this.setState({MainBackground:value});
             }
         });
@@ -70,6 +75,10 @@ class Main extends Component{
     
     onBackButtonPressed() {
         return true;
+    }
+
+    setStateFromChild(stateName,state){
+        eval('this.setState({'+stateName+':'+state+'});')
     }
 
     setShowAddActModal(isShow){
@@ -112,13 +121,14 @@ class Main extends Component{
         /*console.log('Name >> ',parentName);
         console.log('ID >> ',parentID);*/
         this.setState({parentListID:parentID})
-        this.setState({parentList:parentName},()=>{
-            this.setShowAddActModal(true);
-        });
+        this.setState({parentList:parentName});
     }
 
-    addActToList(ID){
+    addActToList(ID,amount){
 
+        if(!amount){
+            amount = 1;
+        }
 
         fetch('http://165.22.242.255/toDoActService/action.php',{
             method:'POST',
@@ -134,7 +144,8 @@ class Main extends Component{
                 "date":(this.state.selectDate.getFullYear()+'-'+(this.state.selectDate.getMonth()+1)+'-'+this.state.selectDate.getDate()),
                 "tabID":this.state.TabData.ID,
                 "token":this.state.token,
-                "parentList":this.state.parentListID
+                "parentList":this.state.parentListID,
+                "amount":amount
             })
         })
         .then(function(response) {
@@ -160,6 +171,12 @@ class Main extends Component{
                         setReRender={this.setReRender}
                         TabData={this.state.TabData}
                         parent={this.state.parentList}
+                    />
+                    <AddTransModal 
+                        Show={this.state.ShowAddTransModal}
+                        setStateFromChild={this.setStateFromChild}
+                        addActToList={this.addActToList}
+                        setReRender={this.setReRender}
                     />
                     <ModalSelectDate 
                         Show={this.state.ShowSelectDateModal}
@@ -187,10 +204,14 @@ class Main extends Component{
                     />
                     <BlockColumn size={0.5} />
                     <AddActs 
-                        setShowAddActModal={this.setShowAddActModal}
+                        TabData={this.state.TabData}
+                        setStateFromChild={this.setStateFromChild}
                         setParentList={this.setParentList}
                     />
                     <BlockColumn size={0.5} />
+                    <Text>
+                        {this.state.MainBackground}
+                    </Text>
                 </View>
             </ImageBackground>
         )

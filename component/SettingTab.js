@@ -6,9 +6,11 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import backgroundIcon from '../assets/backgroundIcon.png';
 import logout from '../assets/logout.png';
+import CoreFunction from '../core-function/core-function.js';
 
 class SettingTab extends Component{
 
+    coreFunction = new CoreFunction()
 
     logout(){
         AsyncStorage.setItem('token','');

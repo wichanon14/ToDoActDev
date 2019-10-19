@@ -40,7 +40,7 @@ class AddActModal extends Component{
     }
 
     componentWillMount(){
-        this.setState({Show:this.props.Show});
+        //this.setState({Show:this.props.Show});
 
         AsyncStorage.getItem('token').then((value)=>{
             if(value){

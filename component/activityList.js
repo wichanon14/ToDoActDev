@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import { View, StyleSheet, ScrollView, AsyncStorage} from 'react-native';
+import { View, StyleSheet, ScrollView, AsyncStorage, Text} from 'react-native';
 import Activity from '../component/activity.js'
+import Transaction from './Transaction.js';
 
 class ActivityList extends Component{
 
@@ -43,7 +44,8 @@ class ActivityList extends Component{
 
     getActivityList(){
         
-        if(this.props.TabData.type === "1"){
+        console.log('tab type >> ',this.props.TabData.type)
+        if(this.props.TabData.type === "1" || this.props.TabData.type === "4"){
             fetch('http://165.22.242.255/toDoActService/action.php',{
                 method:'POST',
                 cache: 'no-cache',
@@ -61,7 +63,7 @@ class ActivityList extends Component{
                 return response.json();
             })
             .then(response=>{
-                
+                //console.log(response);
                 this.setState({ActivityList:[]},()=>{
                     this.setState({ActivityList:response});
                 });
@@ -93,10 +95,18 @@ class ActivityList extends Component{
 
     }
 
+    sumfn(){
+        sum = 0;
+        this.state.ActivityList.forEach((data,i)=>{
+            sum += parseInt(data.amount);
+        })
+        return sum;
+    }
+
     render(){
         return(
             <View style={styles.body}>
-                <ScrollView>
+                <ScrollView style={{display:(this.props.TabData.type!=4)?'flex':'none'}}>
                     {
                         this.state.ActivityList.map((data,key)=>{
                             return(
@@ -115,8 +125,39 @@ class ActivityList extends Component{
                             )
                         })
                     }
-                    
                 </ScrollView>
+                <View style={{display:(this.props.TabData.type==4)?'flex':'none'}}>
+                    <View style={{flex:1,minWidth:'80%',flexDirection:'row',
+                        borderBottomWidth:1,maxHeight:'1%'}}></View>
+                    <Text style={styles.Header}>
+                        Balance : {this.sumfn()}
+                    </Text>
+                    <View style={{flex:1,minWidth:'80%',flexDirection:'row',
+                        borderTopWidth:1,maxHeight:'1%'}}></View>
+                    <ScrollView style={{marginTop:'3%',minHeight:'83%',maxHeight:'83%'}}>
+                        {
+                            this.state.ActivityList.map((data,key)=>{
+                                return(
+                                    <Transaction
+                                        label={data.activity_name}
+                                        list={data}
+                                        id={data.ID}
+                                        key={key}
+                                        check = {data.is_complete}
+                                        setReRender={this.props.setReRender}
+                                        parentList={data.parentList}
+                                        amountSubList={data.amountSubList}
+                                        setParentList={this.props.setParentList}
+                                        setShowHiddenList={this.state.parentListSelect}
+                                        setParentListSelect={this.setParentListSelect}
+                                    />
+                                )
+                            })
+                        }
+                        
+                    </ScrollView>
+                </View>
+                
             </View>
         )
     }
@@ -129,5 +170,24 @@ const styles = StyleSheet.create({
     body:{
         flex:3,
         //borderWidth:2
+    },
+    Header:{
+        flex:1,
+        alignSelf:'center',
+        justifyContent:'center',
+        fontSize:20,
+        fontWeight:'bold',
+        marginTop:'5%',
+        marginBottom:'5%',
+        minHeight:'10%',
+        maxHeight:'10%'
+
+    },
+    HeadCenter:{
+        fontSize:20,
+        fontWeight:'bold'
+    },
+    TextCenter:{
+        textAlign:'center'
     }
 })

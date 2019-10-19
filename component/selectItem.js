@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import {View, Text, TouchableOpacity, Button} from 'react-native';
+import {View, Text, TouchableOpacity, Button, ScrollView} from 'react-native';
 import Modal from 'react-native-modal';
 import BlockColumn from '../component/blockcolumn.js';
 
@@ -7,7 +7,28 @@ class SelectItem extends Component{
 
     state={
         Show:false,
-        Select:this.props.label
+        Select:this.props.label,
+        TabTypeList:[
+        {
+            type:0,
+            type_label:'List'
+        },
+        {
+            type:1,
+            type_label:'Daily'
+        },
+        {
+            type:2,
+            type_label:'Monthly'
+        },
+        {
+            type:3,
+            type_label:'Yearly'
+        },
+        {
+            type:4,
+            type_label:'Ledger'
+        }]
     }
 
     render(){
@@ -54,69 +75,53 @@ class SelectItem extends Component{
                             style={{
                                 fontSize:20,
                                 fontWeight:'bold',
-                                textAlign:'center'
+                                textAlign:'center',
+                                marginTop:'5%',
+                                marginBottom:'5%'
                             }}
                         >
                             {"Select Tab Type"}
                         </Text>
-                        <BlockColumn size={0.15} />
-                        <TouchableOpacity
-                            onPress={
-                                ()=>{
-                                    this.setState({Select:'Daily'},()=>{
-                                        this.props.setTypeTab(1);
-                                        this.setState({Show:false})
-                                    })
-                                }
-                            }
-                            style={{
-                                alignItems:'center'
-                            }}
-                        >
-                            <View 
-                                style={{
-                                    width:'80%',
-                                    borderWidth:2,
-                                    borderColor:'gray',
-                                    paddingTop:'1%',
-                                    paddingBottom:'1%'
-                                }}
-                            >
-                                <Text 
-                                    style={{textAlign:'center'}}
-                                >
-                                    Daily Type
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
-                        <BlockColumn size={0.1} />
-                        <TouchableOpacity
-                            onPress={
-                                ()=>{
-                                    this.setState({Select:'List'},()=>{
-                                        this.props.setTypeTab(0);
-                                        this.setState({Show:false});
-                                    })
-                                }
-                            }
-                            style={{
-                                alignItems:'center'
-                            }}
-                        >
-                            <View
-                                style={{
-                                    width:'80%',
-                                    borderWidth:2,
-                                    borderColor:'gray',
-                                    paddingTop:'1%',
-                                    paddingBottom:'1%'
-                                }}
-                            >
-                                <Text style={{textAlign:'center'}}>
-                                    List Type
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
+                        <BlockColumn size={0.5} />
+                        <ScrollView>
+                        {  
+                            this.state.TabTypeList.map((data,key)=>{
+                                return(
+                                <View key={key} style={{minHeight:'5%',marginBottom:'3%'}}>
+                                    <TouchableOpacity
+                                        onPress={
+                                            ()=>{
+                                                this.setState({Select:data.type_label},()=>{
+                                                    this.props.setTypeTab(data.type);
+                                                    this.setState({Show:false})
+                                                })
+                                            }
+                                        }
+                                        style={{
+                                            alignItems:'center'
+                                        }}
+                                    >
+                                        <View 
+                                            style={{
+                                                width:'80%',
+                                                borderWidth:2,
+                                                borderColor:'gray',
+                                                paddingTop:'1%',
+                                                paddingBottom:'1%'
+                                            }}
+                                        >
+                                            <Text 
+                                                style={{textAlign:'center'}}
+                                            >
+                                                {data.type_label+" Type"} 
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                                )
+                            })
+                        }
+                        </ScrollView>
                         <BlockColumn size={0.6} />
                         <Button 
                             title="Close"
