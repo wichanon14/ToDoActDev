@@ -84,7 +84,7 @@ class AddActModal extends Component{
             
             this.setState({Show:false})
             this.props.setShowAddActModal(false);
-            this.props.addActToList(response['ID']);
+            this.props.addActToList(response['ID'],1);
             
         })
     }

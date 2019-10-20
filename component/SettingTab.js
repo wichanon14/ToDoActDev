@@ -12,6 +12,20 @@ class SettingTab extends Component{
 
     coreFunction = new CoreFunction()
 
+    state={
+        token:''
+    }
+
+    componentWillMount(){
+        AsyncStorage.getItem('token').then((value)=>{
+            if(value){
+                this.setState({token:value});
+            }else{
+                Actions.signin();
+            }
+        });
+    }
+
     logout(){
         AsyncStorage.setItem('token','');
         Actions.signin();
@@ -27,26 +41,44 @@ class SettingTab extends Component{
         //console.log(result);
 
         if(!result.cancelled){
-            this.props.setMainBackground(result.uri);
+            value = this.props.getBackground;
+            FileSystem.deleteAsync(value, {
+                idempotent:true
+            })
+            var nameIndex = result.uri.lastIndexOf("/");
+            var fileName = result.uri.substr(nameIndex+1,50);
 
-            AsyncStorage.getItem('backgroundImg').then((value)=>{
-                if(value){
-                    FileSystem.deleteAsync(value, {
-                        idempotent:false
-                    })
-                    var nameIndex = result.uri.lastIndexOf("/");
-                    var fileName = result.uri.substr(nameIndex+1,50);
-                    //console.log('nameIndex >> ',fileName);
-                    FileSystem.copyAsync({
-                        from:result.uri,
-                        to:FileSystem.documentDirectory+fileName
-                    })
-                    AsyncStorage.setItem('backgroundImg',FileSystem.documentDirectory+fileName);
-                }
-            });
+            FileSystem.copyAsync({
+                from:result.uri,
+                to:FileSystem.documentDirectory+fileName
+            })
+            this.props.setMainBackground(FileSystem.documentDirectory+fileName);
+            //AsyncStorage.setItem('backgroundImg',FileSystem.documentDirectory+fileName);
+            this.updateImgBackground(fileName)
             
         }
 
+    }
+
+    updateImgBackground(path){
+        fetch('http://165.22.242.255/toDoActService/action.php',{
+            method:'POST',
+            cache: 'no-cache',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                "action":"updateImageBackground",
+                "token":this.state.token,
+                "path":path
+            })
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(response=>{
+            console.log(response);
+        })
     }
 
     render(){

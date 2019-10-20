@@ -75,7 +75,7 @@ class Transaction extends Component{
     refMoreButton = el => this.moreButton = el;
 
     showMore = () => {
-        console.log(this.props.label.length);
+        //console.log(this.props.label.length);
         if(this.state.parentList==0){
             showPopupMenu(
                 [
@@ -130,7 +130,7 @@ class Transaction extends Component{
             <View style={styles.body} >
                 <TouchableOpacity
                     onPress={()=>{
-                        console.log('>> ',typeof(this.props.list.amount));
+                        //console.log('>> ',typeof(this.props.list.amount));
                         this.showMore();
                     }}
                     onLongPress={()=>{

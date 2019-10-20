@@ -82,7 +82,7 @@ class ModalTabSelect extends Component{
             return response.json();
         })
         .then(response=>{
-            console.log(response);
+            //console.log(response);
             this.getTabList();
         })
     }

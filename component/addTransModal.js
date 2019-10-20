@@ -10,6 +10,7 @@ class AddTransModal extends Component{
     constructor(props){
         super(props);
         this.props.setReRender = this.props.setReRender.bind(this);
+        this.setStateFromChild = this.setStateFromChild.bind(this);
     }
 
     coreFunction = new CoreFunction();
@@ -20,7 +21,9 @@ class AddTransModal extends Component{
         displayAutocomplete:'none',
         listAutocompleteAct:[],
         token:'',
-        amount:"1",
+        amount:"",
+        payAction:1,
+        showAmount:""
     }
 
     componentWillMount(){
@@ -39,6 +42,9 @@ class AddTransModal extends Component{
         if(props.Show != this.state.Show){            
             this.setState({Show:props.Show});
             this.setState({TransactionName:''});
+            this.setState({amount:''});
+            this.setState({showAmount:''});
+            this.setState({payAction:1});
         }
         
     }
@@ -62,7 +68,7 @@ class AddTransModal extends Component{
             
             this.setState({Show:false})
             //Close Modal
-            this.props.addActToList(response['ID']);
+            this.props.addActToList(response['ID'],this.state.amount);
             
         })
     }
@@ -102,7 +108,15 @@ class AddTransModal extends Component{
     onSelectAutocomplete(item){
         
         this.setState({TransactionName:item.activity_name},
-            ()=>this.setState({displayAutocomplete:'none'}))
+            ()=>{
+                this.setState({displayAutocomplete:'none'});
+                this.input_1.focus()
+            }
+        )
+    }
+
+    setStateFromChild(stateName,state){
+        eval('this.setState({'+stateName+':'+state+'});')
     }
 
     render(){
@@ -127,7 +141,7 @@ class AddTransModal extends Component{
                     <BlockColumn size={0.2}/>
 
                     <LocalSwitch 
-                    
+                        setStateFromChild={this.setStateFromChild}
                     />
 
                     <BlockColumn size={0.1}/>
@@ -136,7 +150,11 @@ class AddTransModal extends Component{
                             borderColor: 'gray', borderWidth: 1,
                             marginLeft:'15%',paddingLeft:10}}
                         onChangeText={(txt)=>{
-                            this.setState({TransactionName:txt},()=>this.AutocompleteActivity())  
+                            this.setState({TransactionName:txt},
+                                ()=>{
+                                    this.AutocompleteActivity();
+                                }
+                            )  
                         }}
                         value={this.state.TransactionName}
                         placeholder="Transaction Name"
@@ -170,14 +188,26 @@ class AddTransModal extends Component{
                     
                     <BlockColumn size={0.1}/>
                     <TextInput 
-                        placeholder="amount"
+                        placeholder="Amount"
                         style={{width:'70%',height: 40, 
                         borderColor: 'gray', borderWidth: 1,
                         marginLeft:'15%',paddingLeft:10}}
                         onChangeText={(txt)=>{
-                            this.setState({amount:txt});
+                            if(this.state.payAction){
+                                this.setState({amount:"-"+txt});
+                            }else{
+                                this.setState({amount:txt});
+                            }
+                            this.setState({showAmount:txt});
+                            //console.log('amount >> ',this.state.amount);
                         }}
-                        value={this.state.amount}
+                        value={this.state.showAmount}
+                        ref={(ref) => { 
+                            this.input_1 = ref; 
+                        }}
+                        onFocus={()=>{
+                            this.input_1.clear()
+                        }}
                     />
 
                     <BlockColumn size={0.3}/>
@@ -188,7 +218,6 @@ class AddTransModal extends Component{
                             title="ADD"
                             onPress={async ()=>{
                                 d = await this.coreFunction.CreateActivity(this.state.TransactionName);
-                                console.log('d >> ',d);
                                 this.props.addActToList(d,this.state.amount);
                                 this.setState({Show:false})
                                 this.props.setStateFromChild('ShowAddTransModal',false);

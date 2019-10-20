@@ -34,7 +34,7 @@ class Signin extends Component{
                             maxLength={40}
                             style={{borderWidth:1,width:'80%',padding:10}}
                             onChangeText={(txt)=>{
-                                console.log('txt >> ',txt,' length >> ',txt.replace(/^A-Za-z0-9.@_/,"").length);
+                                //console.log('txt >> ',txt,' length >> ',txt.replace(/^A-Za-z0-9.@_/,"").length);
                                 this.setState({username:(txt.replace(/^A-Za-z0-9.@_/,""))});
                             }}
                             defaultValue={this.state.username}

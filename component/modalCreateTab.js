@@ -58,7 +58,7 @@ class ModalCreateTab extends Component{
             return response.json();
         })
         .then(response=>{
-            console.log(response);
+            //console.log(response);
             this.setState({Show:false},()=>{
                 this.props.setShowModalCreateTab(false);
                 this.props.getTabList();
@@ -92,7 +92,7 @@ class ModalCreateTab extends Component{
                             onChangeText={
                                 (txt)=>{
                                     this.setState({Name:txt},()=>{
-                                        console.log('txt >> ',txt);
+                                        //console.log('txt >> ',txt);
                                     });
                                 }
                             }

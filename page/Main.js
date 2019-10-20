@@ -9,6 +9,7 @@ import AddActsModal from '../component/addActModal.js';
 import ModalSelectDate from '../component/modalSelectDate.js';
 import AddTransModal from '../component/addTransModal.js';
 import SettingTab from '../component/SettingTab.js';
+import * as FileSystem from 'expo-file-system';
 
 class Main extends Component{
     constructor(props){
@@ -50,18 +51,37 @@ class Main extends Component{
     componentWillMount(){
         AsyncStorage.getItem('token').then((value)=>{
             if(value){
-                this.setState({token:value});
+                this.setState({token:value},()=>{
+                    this.getImgBackground();
+                });
             }else{
                 Actions.signin();
             }
         });
+
         
-        AsyncStorage.getItem('backgroundImg').then((value)=>{
-            if(value){
-                
-                this.setState({MainBackground:value});
+    }
+
+    getImgBackground(){
+        fetch('http://165.22.242.255/toDoActService/action.php',{
+            method:'POST',
+            cache: 'no-cache',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                "action":"getImageBackground",
+                "token":this.state.token,
+            })
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(response=>{
+            if(response){
+                this.setState({MainBackground:FileSystem.documentDirectory+response.img});
             }
-        });
+        })
     }
 
     //Disabled Back Button
@@ -152,7 +172,7 @@ class Main extends Component{
             return response.json();
         })
         .then(response=>{
-            //console.log(response);
+            console.log(response);
             this.setState({reRender:true});
             this.setIsContinue(false);
         })
@@ -187,6 +207,7 @@ class Main extends Component{
                     />
                     <SettingTab 
                         setMainBackground = {this.setMainBackground}
+                        getBackground = {this.state.MainBackground}
                     />
                     <Header 
                         setSelectDateModal={this.setSelectDateModal}
@@ -209,9 +230,6 @@ class Main extends Component{
                         setParentList={this.setParentList}
                     />
                     <BlockColumn size={0.5} />
-                    <Text>
-                        {this.state.MainBackground}
-                    </Text>
                 </View>
             </ImageBackground>
         )

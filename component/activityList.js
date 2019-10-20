@@ -44,7 +44,7 @@ class ActivityList extends Component{
 
     getActivityList(){
         
-        console.log('tab type >> ',this.props.TabData.type)
+        //console.log('tab type >> ',this.props.TabData.type)
         if(this.props.TabData.type === "1" || this.props.TabData.type === "4"){
             fetch('http://165.22.242.255/toDoActService/action.php',{
                 method:'POST',
