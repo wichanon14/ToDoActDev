@@ -3,29 +3,52 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 class AddActs extends Component{
 
+    state = {
+        txt:"Add Activities",
+        type:0
+    }
+
+    componentWillMount(){
+        this.setState({txt:this.txtAdd()});
+        this.setState({type:this.props.TabData.type})
+    }
+
+    componentWillUpdate(props){
+        if(props.TabData.type != this.state.type){
+            this.setState({txt:this.txtAdd()});
+            this.setState({type:this.props.TabData.type})
+        }
+    }
+
+    txtAdd(){
+        switch(parseInt(this.props.TabData.type)){
+            case 0: return 'Add Activities';
+            case 1: return 'Add Activities';
+            case 4: return 'Add Transactions';
+            default:break;
+        }
+
+    }
+
     render(){
         return(
             <TouchableOpacity 
                 onPress={
                     ()=>{
-                        console.log(this.props.TabData);
                         switch(parseInt(this.props.TabData.type)){
+                            case 0: this.props.setStateFromChild('ShowAddActModal',true); break;
                             case 1: this.props.setStateFromChild('ShowAddActModal',true); break;
-                            case 2: this.props.setStateFromChild('ShowAddActModal',true); break;
-                            case 3: this.props.setStateFromChild('ShowAddActModal',true); break;
                             case 4: this.props.setStateFromChild('ShowAddTransModal',true); break;
                             default:break;
                         }
-                        this.props.setParentList('',0);
+                        this.props.setParentList('',0,this.props.TabData.type);
                     }
                 }
             >
                 <View style={styles.main}>
                     <Text style={styles.txt}>
                         {
-                            (parseInt(this.props.TabData.type) === 1)?
-                            'Add Activities':
-                            'Add Transactions'
+                            this.txtAdd()
                         }    
                     </Text>
                 </View>

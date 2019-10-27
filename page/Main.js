@@ -137,17 +137,22 @@ class Main extends Component{
         });
     }
 
-    setParentList(parentName,parentID){
-        /*console.log('Name >> ',parentName);
-        console.log('ID >> ',parentID);*/
+    setParentList(parentName,parentID,TabType){
         this.setState({parentListID:parentID})
-        this.setState({parentList:parentName});
+        this.setState({parentList:parentName},()=>{
+            if(TabType != 4)
+                this.setShowAddActModal(true);
+        });
     }
 
-    addActToList(ID,amount){
+    addActToList(ID,amount,group){
 
         if(!amount){
             amount = 1;
+        }
+
+        if(!group){
+            group = 0;
         }
 
         fetch('http://165.22.242.255/toDoActService/action.php',{
@@ -165,14 +170,14 @@ class Main extends Component{
                 "tabID":this.state.TabData.ID,
                 "token":this.state.token,
                 "parentList":this.state.parentListID,
-                "amount":amount
+                "amount":amount,
+                "group":group
             })
         })
         .then(function(response) {
             return response.json();
         })
         .then(response=>{
-            console.log(response);
             this.setState({reRender:true});
             this.setIsContinue(false);
         })
@@ -197,6 +202,7 @@ class Main extends Component{
                         setStateFromChild={this.setStateFromChild}
                         addActToList={this.addActToList}
                         setReRender={this.setReRender}
+                        TabData={this.state.TabData}
                     />
                     <ModalSelectDate 
                         Show={this.state.ShowSelectDateModal}

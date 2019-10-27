@@ -77,7 +77,7 @@ class SettingTab extends Component{
             return response.json();
         })
         .then(response=>{
-            console.log(response);
+            //console.log(response);
         })
     }
 

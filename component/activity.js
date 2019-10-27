@@ -98,7 +98,6 @@ class Activity extends Component{
     refMoreButton = el => this.moreButton = el;
 
     showMore = () => {
-        //console.log(this.props.label.length);
         if(this.state.parentList==0){
             showPopupMenu(
                 [

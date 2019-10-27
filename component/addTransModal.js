@@ -4,6 +4,7 @@ import {View, Button, Text, TextInput, StyleSheet, TouchableOpacity,
 import Modal from 'react-native-modal';
 import BlockColumn from './blockcolumn.js';
 import LocalSwitch from './localSwitch.js';
+import SelectItemModal from './SelectItemModal.js';
 import CoreFunction from '../core-function/core-function.js';
 
 class AddTransModal extends Component{
@@ -23,7 +24,10 @@ class AddTransModal extends Component{
         token:'',
         amount:"",
         payAction:1,
-        showAmount:""
+        showAmount:"",
+        group:0,
+        groupName:'No Group',
+        ShowSelectItem:false
     }
 
     componentWillMount(){
@@ -45,6 +49,7 @@ class AddTransModal extends Component{
             this.setState({amount:''});
             this.setState({showAmount:''});
             this.setState({payAction:1});
+            this.setState({group:0,groupName:'No Group'})
         }
         
     }
@@ -116,7 +121,11 @@ class AddTransModal extends Component{
     }
 
     setStateFromChild(stateName,state){
-        eval('this.setState({'+stateName+':'+state+'});')
+        if(typeof(state)==="string"){
+            eval('this.setState({'+stateName+':"'+state+'"});')
+        }else{
+            eval('this.setState({'+stateName+':'+state+'});')
+        }
     }
 
     render(){
@@ -129,6 +138,13 @@ class AddTransModal extends Component{
                 >
                 <BlockColumn size={0.2}/>
                 <View style={styles.bodyModal}>                 
+                    <SelectItemModal 
+                        Show={this.state.ShowSelectItem}
+                        setStateFromChild={this.setStateFromChild}
+                        token={this.state.token}
+                        TabData={this.props.TabData}
+                        label="Select Group"
+                    />
                     <BlockColumn size={0.2}/>
                     <View>
                         <Text style={styles.HeadCenter}>
@@ -140,9 +156,23 @@ class AddTransModal extends Component{
                     </View>
                     <BlockColumn size={0.2}/>
 
-                    <LocalSwitch 
-                        setStateFromChild={this.setStateFromChild}
-                    />
+                    <View style={{width:'100%',flexDirection:'row',maxHeight:'7%',overflow:'hidden'}}>
+                        <LocalSwitch 
+                            setStateFromChild={this.setStateFromChild}
+                        />
+                        <BlockColumn size={0.6}/>
+                        <TouchableOpacity style={{width:'30%',borderWidth:1}}
+                            onPress={()=>{
+                                this.setState({ShowSelectItem:true});
+                            }}
+                        >
+                            <Text style={{textAlign:'center',minHeight:'100%',
+                            textAlignVertical:'center'}}>
+                                {this.state.groupName}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    
 
                     <BlockColumn size={0.1}/>
                     <TextInput 
@@ -199,7 +229,6 @@ class AddTransModal extends Component{
                                 this.setState({amount:txt});
                             }
                             this.setState({showAmount:txt});
-                            //console.log('amount >> ',this.state.amount);
                         }}
                         value={this.state.showAmount}
                         ref={(ref) => { 
@@ -218,7 +247,7 @@ class AddTransModal extends Component{
                             title="ADD"
                             onPress={async ()=>{
                                 d = await this.coreFunction.CreateActivity(this.state.TransactionName);
-                                this.props.addActToList(d,this.state.amount);
+                                this.props.addActToList(d,this.state.amount,this.state.group);
                                 this.setState({Show:false})
                                 this.props.setStateFromChild('ShowAddTransModal',false);
                             }}
