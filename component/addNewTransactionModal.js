@@ -35,20 +35,20 @@ class AddNewTransactionModal extends Component{
             <Modal
                 isVisible={this.props.Show}
                 animationInTiming={300}
-                    animationOutTiming={500}
-                    backdropTransitionOutTiming={100}
-                    style={{
-                        justifyContent:'center',
-                        alignItems:'center'
-                    }}
-                    animationType="slide"
-                    hasBackdrop={true}
-                    onBackdropPress={
-                        ()=>{
-                            this.setState({Show:false});
-                            this.props.setStateFromChildC("ShowAddNew",false);
-                        }
+                animationOutTiming={500}
+                backdropTransitionOutTiming={100}
+                style={{
+                    justifyContent:'center',
+                    alignItems:'center'
+                }}
+                animationType="slide"
+                hasBackdrop={true}
+                onBackdropPress={
+                    ()=>{
+                        this.setState({Show:false});
+                        this.props.setStateFromChildC("ShowAddNew",false);
                     }
+                }
             >
                 <View style={{backgroundColor:'white',height:'50%',width:'80%'}}>
                     <BlockColumn size={0.2} />

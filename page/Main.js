@@ -210,10 +210,12 @@ class Main extends Component{
                         selectDate={this.state.selectDate}
                         setSelectDate={this.setSelectDate}
                         setReRender={this.setReRender}
+                        showAll={true}
                     />
                     <SettingTab 
                         setMainBackground = {this.setMainBackground}
                         getBackground = {this.state.MainBackground}
+                        TabID = {this.state.TabData}
                     />
                     <Header 
                         setSelectDateModal={this.setSelectDateModal}

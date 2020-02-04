@@ -6,14 +6,23 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import backgroundIcon from '../assets/backgroundIcon.png';
 import logout from '../assets/logout.png';
+import summaryIcon from '../assets/summary-icon.png';
 import CoreFunction from '../core-function/core-function.js';
+import ReportModal from './modal/reportModal.js';
 
 class SettingTab extends Component{
+
+    constructor(props){
+        super(props);
+        this.setStateFromChild = this.setStateFromChild.bind(this);
+    }
 
     coreFunction = new CoreFunction()
 
     state={
-        token:''
+        token:'',
+        ShowReportModal:false,
+        TabID:this.props.TabID
     }
 
     componentWillMount(){
@@ -81,24 +90,50 @@ class SettingTab extends Component{
         })
     }
 
+    // set state in the component from child 
+    setStateFromChild(name,value){
+        eval('this.setState({'+name+':'+value+'})');
+    }
+
+
     render(){
 
         return(
             <View style={style.Body}>
-                <TouchableOpacity
-                    onPress={()=>{
-                        this._pickImage();
-                    }}
-                >   
-                    <Image source={backgroundIcon} style={{width: 25, height: 25,opacity:0.8}}/>
-                </TouchableOpacity>
-                <BlockColumn size={0.05} />
-                <TouchableOpacity
-                    onPress={()=>this.logout()}
-                >   
-                    <Image source={logout} style={{width: 25, height: 25,opacity:0.8}}/>
-                </TouchableOpacity>
-                <BlockColumn size={0.05} />
+                <ReportModal 
+                    show={this.state.ShowReportModal}
+                    setParentState={this.setStateFromChild}
+                    TabID={this.props.TabID.ID}
+                    />
+                <View style={{width:'50%',justifyContent:'flex-start',flexDirection:'row',
+                //Show Report Icon only daily list and transaction list
+                display:(this.props.TabID.ID==='1'||this.props.TabID.ID==='17')?'flex':'none'}}>
+                    <BlockColumn size={0.2} />
+                    <TouchableOpacity
+                        onPress={()=>{
+                            this.setState({ShowReportModal:true});
+                        }}
+                    >   
+                        <Image source={summaryIcon} style={{top:'8%',width: 35, height: 30,opacity:0.8}}/>
+                    </TouchableOpacity>
+                </View>
+                <View style={{width:'50%',justifyContent:'flex-end',
+                alignContent:'flex-end',flexDirection:'row'}}>
+                    <TouchableOpacity
+                        onPress={()=>{
+                            this._pickImage();
+                        }}
+                    >   
+                        <Image source={backgroundIcon} style={{width: 25, height: 25,opacity:0.8}}/>
+                    </TouchableOpacity>
+                    <BlockColumn size={0.1} />
+                    <TouchableOpacity
+                        onPress={()=>this.logout()}
+                    >   
+                        <Image source={logout} style={{width: 25, height: 25,opacity:0.8}}/>
+                    </TouchableOpacity>
+                    <BlockColumn size={0.05} />
+                </View>
             </View>
         )
     }

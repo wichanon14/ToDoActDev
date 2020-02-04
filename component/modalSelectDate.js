@@ -164,43 +164,55 @@ class ModalSelectDate extends Component{
                         
                         <View style={{flexDirection:'row'}}>
 
-                            <View style={{alignItems:'center',justifyContent:'center'}}>
-                                <Text>Date</Text>
-                                <TouchableOpacity onPress={()=>this.changeDate('up','date')}>
-                                    <Image source={arrowUp} style={{width:60,height:32}}/>
-                                </TouchableOpacity>
-                                <Text style={styles.DateSelect}>
-                                    {(this.state.date>9)?this.state.date:'0'+this.state.date}
-                                </Text>
-                                <TouchableOpacity onPress={()=>this.changeDate('down','date')}>
-                                    <Image source={arrowDown} style={{width:60,height:32}}/>
-                                </TouchableOpacity>
-                            </View>
+                            {
+                                (this.props.showOnly==='Date'||this.props.showAll)?
+                                <View style={{alignItems:'center',justifyContent:'center'}}>
+                                    <Text>Date</Text>
+                                    <TouchableOpacity onPress={()=>this.changeDate('up','date')}>
+                                        <Image source={arrowUp} style={{width:60,height:32}}/>
+                                    </TouchableOpacity>
+                                    <Text style={styles.DateSelect}>
+                                        {(this.state.date>9)?this.state.date:'0'+this.state.date}
+                                    </Text>
+                                    <TouchableOpacity onPress={()=>this.changeDate('down','date')}>
+                                        <Image source={arrowDown} style={{width:60,height:32}}/>
+                                    </TouchableOpacity>
+                                </View>:
+                                <View></View>
+                            }
+                            
+                            {
+                                (this.props.showOnly==='Month'||this.props.showAll)?
+                                <View style={{paddingLeft:20,paddingRight:20,
+                                    alignItems:'center',justifyContent:'center'}}>
+                                    <Text>Month</Text>
+                                    <TouchableOpacity onPress={()=>this.changeDate('up','month')}>
+                                        <Image source={arrowUp} style={{width:60,height:32}}/>
+                                    </TouchableOpacity>
+                                    <Text style={styles.DateSelectMonth}>
+                                        {this.state.monthName}
+                                    </Text>
+                                    <TouchableOpacity onPress={()=>this.changeDate('down','month')}>
+                                        <Image source={arrowDown} style={{width:60,height:32}}/>
+                                    </TouchableOpacity>
+                                </View>:
+                                <View></View>
+                            }
 
-                            <View style={{paddingLeft:20,paddingRight:20,
-                                alignItems:'center',justifyContent:'center'}}>
-                                <Text>Month</Text>
-                                <TouchableOpacity onPress={()=>this.changeDate('up','month')}>
-                                    <Image source={arrowUp} style={{width:60,height:32}}/>
-                                </TouchableOpacity>
-                                <Text style={styles.DateSelectMonth}>
-                                    {this.state.monthName}
-                                </Text>
-                                <TouchableOpacity onPress={()=>this.changeDate('down','month')}>
-                                    <Image source={arrowDown} style={{width:60,height:32}}/>
-                                </TouchableOpacity>
-                            </View>
-
-                            <View style={{alignItems:'center',justifyContent:'center'}}>
-                                <Text>Year</Text>
-                                <TouchableOpacity onPress={()=>this.changeDate('up','year')}>
-                                    <Image source={arrowUp} style={{width:60,height:32}}/>
-                                </TouchableOpacity>
-                                <Text style={styles.DateSelect}>{this.state.year}</Text>
-                                <TouchableOpacity onPress={()=>this.changeDate('down','year')}>
-                                    <Image source={arrowDown} style={{width:60,height:32}}/>
-                                </TouchableOpacity>
-                            </View>
+                            {(this.props.showOnly==='Year'||this.props.showAll)?
+                                <View style={{alignItems:'center',justifyContent:'center'}}>
+                                    <Text>Year</Text>
+                                    <TouchableOpacity onPress={()=>this.changeDate('up','year')}>
+                                        <Image source={arrowUp} style={{width:60,height:32}}/>
+                                    </TouchableOpacity>
+                                    <Text style={styles.DateSelect}>{this.state.year}</Text>
+                                    <TouchableOpacity onPress={()=>this.changeDate('down','year')}>
+                                        <Image source={arrowDown} style={{width:60,height:32}}/>
+                                    </TouchableOpacity>
+                                </View>:
+                                <View></View>
+                            }
+                            
                         </View>
                     </View>
 
