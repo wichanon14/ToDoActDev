@@ -95,7 +95,6 @@ class SettingTab extends Component{
         eval('this.setState({'+name+':'+value+'})');
     }
 
-
     render(){
 
         return(
@@ -104,7 +103,7 @@ class SettingTab extends Component{
                     show={this.state.ShowReportModal}
                     setParentState={this.setStateFromChild}
                     TabID={this.props.TabID.ID}
-                    />
+                />
                 <View style={{width:'50%',justifyContent:'flex-start',flexDirection:'row',
                 //Show Report Icon only daily list and transaction list
                 display:(this.props.TabID.ID==='1'||this.props.TabID.ID==='17')?'flex':'none'}}>

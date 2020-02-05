@@ -38,10 +38,7 @@ class ReportModal extends Component{
     componentWillMount(){
         AsyncStorage.getItem('token').then((value)=>{
             if(value){
-                this.setState({token:value},
-                ()=>{
-                    
-                });
+                this.setState({token:value});
             }else{
                 Actions.signin();
             }
@@ -117,7 +114,7 @@ class ReportModal extends Component{
             return response.json();
         })
         .then(response=>{
-            console.log(response);
+            //console.log(response);
         })
     }
 
@@ -142,7 +139,7 @@ class ReportModal extends Component{
         })
         .then(response=>{
             this.setState({reportList:[]});
-            if(response){
+            if(response.length){
                 this.setState({reportList:response});
             }
             
